@@ -4,31 +4,25 @@
 int main( int argc, char *argv[] )
 {
 	char sy, dy, ch[10];
-	int sx, dx, n, i, j, score, stop, cout, cout2, legal, hauteur, sauter;
+	int sx, dx, n, i, j, score, stop, cout, cout2, legal, depth, sauter;
 	int cmin, cmax, mode, cpt;
    	double stats1[100];
 	double stats2[100];
-	long nb_noeuds1=0;
-	long nb_noeuds2=0;
-	long nb_coupes1 = 0;
-	long nb_coupes2 = 0;
-
-
+	long nb_node1=0;
+	long nb_node2=0;
+	long nb_sec1 = 0;
+	long nb_sec2 = 0;
    struct config T[100], conf, conf1;
-
+   
+   
    if ( argc == 1 ) 
-	hauteur = 5;  
+	depth = 5;  
    else
-	hauteur = atoi( argv[1] ); 
-
-   printf("\n\nProfondeur d'exploration = %d\n\n", hauteur);
-
+	depth = atoi( argv[1] ); 
+   
+   printf("\n \nDepthOfExploration = %d\n\n", depth);
    
    init( &conf );
-  
-   
-
-   
    stop = 0;
    mode = MAX;
    
@@ -36,9 +30,9 @@ int main( int argc, char *argv[] )
    int alpha, beta;
    double result;
    cpt = 0;
-   nb_noeuds1=0;
-   nb_noeuds2=0;
-   long local_nb_noeuds1 = 0, local_nb_coupes1= 0, local_nb_coupes2 = 0, local_nb_noeuds2 = 0;
+   nb_node1=0;
+   nb_node2=0;
+   long local_nb_node1 = 0, local_nb_sec1= 0, local_nb_sec2 = 0, local_nb_node2 = 0;
 
    while (!stop && (cpt < 50))
    {
@@ -55,7 +49,7 @@ int main( int argc, char *argv[] )
 		j = -1;
 		
 		gettimeofday(&begin, NULL);
-		#pragma omp parallel private (local_nb_noeuds2, local_nb_coupes2, local_nb_noeuds1, local_nb_coupes1) 
+		#pragma omp parallel private (local_nb_node2, local_nb_sec2, local_nb_node1, local_nb_sec1) 
 		{
 		
 			#pragma omp for  schedule (dynamic) 
@@ -65,10 +59,10 @@ int main( int argc, char *argv[] )
 				if (mode == MAX)
 				{
 
-					local_nb_coupes1 = 0;
-					local_nb_noeuds1 = 0;
+					local_nb_sec1 = 0;
+					local_nb_node1 = 0;
 					
-					cout = minmax_ab(T[i], MIN, hauteur-1, alpha, beta, &local_nb_noeuds1, &local_nb_coupes1);
+					cout = minmax_ab(T[i], MIN, depth-1, alpha, beta, &local_nb_node1, &local_nb_sec1);
 					#pragma omp critical
 					{
 						if (cout > score) 
@@ -77,8 +71,8 @@ int main( int argc, char *argv[] )
 							score = cout;
 							j = i;
 						}
-						nb_noeuds1 += local_nb_noeuds1;
-						nb_coupes1 += local_nb_coupes1;
+						nb_node1 += local_nb_node1;
+						nb_sec1 += local_nb_sec1;
 						
 					}
 				
@@ -86,9 +80,9 @@ int main( int argc, char *argv[] )
 				}
 				else
 				{
-					local_nb_coupes2 = 0;
-					local_nb_noeuds2 = 0;
-					cout = minmax_ab2(T[i], MAX, hauteur-1, alpha, beta, &local_nb_noeuds2, &local_nb_coupes2);
+					local_nb_sec2 = 0;
+					local_nb_node2 = 0;
+					cout = minmax_ab2(T[i], MAX, depth-1, alpha, beta, &local_nb_node2, &local_nb_sec2);
 					
 					#pragma omp critical
 					{
@@ -98,8 +92,8 @@ int main( int argc, char *argv[] )
 							score = cout;
 							j = i;
 						}
-						nb_coupes2 += local_nb_coupes2;
-						nb_noeuds2 += local_nb_noeuds2;
+						nb_sec2 += local_nb_sec2;
+						nb_node2 += local_nb_node2;
 					}
 					
 				}
@@ -137,11 +131,11 @@ int main( int argc, char *argv[] )
 	char res[30];
 	FILE * f = fopen("results.txt", "w");
 
-	snprintf(res, 30, "%ld", nb_noeuds1);
+	snprintf(res, 30, "%ld", nb_node1);
 	fputs(res, f);
 	fputs("\n", f);
 
-	snprintf(res, 30, "%ld", nb_noeuds2);
+	snprintf(res, 30, "%ld", nb_node2);
 	fputs(res, f);
 	fputs("\n", f);
 
