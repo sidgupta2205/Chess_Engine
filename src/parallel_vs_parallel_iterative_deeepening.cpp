@@ -1,5 +1,9 @@
-#include "compulsory_headers.h"
-#include "generators.h"
+#include "headers/compulsory_headers.h"
+#include "headers/generators.h"
+
+
+
+
 
 int main( int argc, char *argv[] )
 {
@@ -88,7 +92,7 @@ int main( int argc, char *argv[] )
 				{
 					local_nb_coupes2 = 0;
 					local_nb_noeuds2 = 0;
-					cout = minmax_ab2(T[i], MAX, hauteur-1, alpha, beta, &local_nb_noeuds2, &local_nb_coupes2);
+					cout = iterative_deepening(T[i], MAX, hauteur-1, alpha, beta, &local_nb_noeuds2, &local_nb_coupes2);
 					
 					#pragma omp critical
 					{
