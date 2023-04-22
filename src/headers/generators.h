@@ -1,7 +1,7 @@
 #include "transforms_displacements.h"
 #include "definations.h"
 
-void generer_succ( struct config conf, int mode, struct config T[], int *n )
+static void generer_succ( struct config conf, int mode, struct config T[], int *n )
 {
 	int i, j, k, stop;
 
@@ -54,7 +54,7 @@ void generer_succ( struct config conf, int mode, struct config T[], int *n )
 
 
 
-int minmax_ab2( struct config conf, int mode, int niv, int alpha, int beta, long * nb_noeuds, long * nb_coupes)
+static int minmax_ab2( struct config conf, int mode, int niv, int alpha, int beta, long * nb_noeuds, long * nb_coupes)
 {
 	
  	int n, i, score, score2;
@@ -115,7 +115,7 @@ int minmax_ab2( struct config conf, int mode, int niv, int alpha, int beta, long
 } 
 
 
-int minmax_ab( struct config conf, int mode, int niv, int alpha, int beta, long * nb_noeuds, long * nb_coupes)
+static int minmax_ab( struct config conf, int mode, int niv, int alpha, int beta, long * nb_noeuds, long * nb_coupes)
 {
 	
  	int n, i, score, score2;
@@ -173,7 +173,7 @@ int minmax_ab( struct config conf, int mode, int niv, int alpha, int beta, long 
 
 } 
 
-int minmax( struct config conf, int mode, int niv)
+static int minmax( struct config conf, int mode, int niv)
 {
  	int n, i, score, score2;
  	struct config T[100];
@@ -215,7 +215,7 @@ int minmax( struct config conf, int mode, int niv)
 
 }
 
-int iterative_deepening(struct config conf, int mode, int niv, int alpha, int beta, long * nb_noeuds, long * nb_coupes)
+static int iterative_deepening(struct config conf, int mode, int niv, int alpha, int beta, long * nb_noeuds, long * nb_coupes)
 {
 	int n,j, i, score, score2;
  	struct config T[100];

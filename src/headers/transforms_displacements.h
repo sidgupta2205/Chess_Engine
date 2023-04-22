@@ -1,6 +1,6 @@
 #include "beam_search_func.h"
 
-void transformPion( struct config conf, int a, int b, int x, int y, struct config T[], int *n )
+static void transformPion( struct config conf, int a, int b, int x, int y, struct config T[], int *n )
 {
 	int signe = +1;
 	if (conf.mat[a][b] < 0 ) signe = -1;
@@ -25,7 +25,7 @@ void transformPion( struct config conf, int a, int b, int x, int y, struct confi
 
 
 
-int caseMenaceePar( int mode, int x, int y, struct config conf )
+static int caseMenaceePar( int mode, int x, int y, struct config conf )
 {
 	int i, j, a, b, stop;
 
@@ -77,7 +77,7 @@ int caseMenaceePar( int mode, int x, int y, struct config conf )
 
 
 
-void deplacementsN(struct config conf, int x, int y, struct config T[], int *n )
+static void deplacementsN(struct config conf, int x, int y, struct config T[], int *n )
 {
 	int i, j, a, b, stop;
 
@@ -283,7 +283,7 @@ void deplacementsN(struct config conf, int x, int y, struct config T[], int *n )
 
 
 
-void deplacementsB(struct config conf, int x, int y, struct config T[], int *n )
+static void deplacementsB(struct config conf, int x, int y, struct config T[], int *n )
 {
 	int i, j, a, b, stop;
 
@@ -486,7 +486,7 @@ void deplacementsB(struct config conf, int x, int y, struct config T[], int *n )
 
 } 
 
-void trier_config_table(struct config T [], int n)
+static void trier_config_table(struct config T [], int n)
 {
 	int i;
 	for (i = 0; i < n; i++)

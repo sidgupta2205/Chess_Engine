@@ -2,17 +2,17 @@
 #include "new_structures.h"
 #include "definations.h"
 
-int minmax_ab( struct config conf, int mode, int niv, int min, int max, long * nb_noeuds, long * nb_coupes);
+static int minmax_ab( struct config conf, int mode, int niv, int min, int max, long * nb_noeuds, long * nb_coupes);
 
 
-int AucunCoupPossible( struct config conf )
+static int AucunCoupPossible( struct config conf )
 {
       	
 	return 0;
 
 } 
 
-int feuille( struct config conf, int *cout )
+static int feuille( struct config conf, int *cout )
 {
 	
 	
@@ -39,7 +39,7 @@ int feuille( struct config conf, int *cout )
 
 }  
 
-void copier( struct config *c1, struct config *c2 ) 
+static void copier( struct config *c1, struct config *c2 ) 
 {
 	int i, j;
 
@@ -58,7 +58,7 @@ void copier( struct config *c1, struct config *c2 )
 } 
 
 
-int egal(char c1[8][8], char c2[8][8] )
+static int egal(char c1[8][8], char c2[8][8] )
 {
 	int i, j;
 
@@ -68,7 +68,7 @@ int egal(char c1[8][8], char c2[8][8] )
 	return 1;
 } 
 
-int nbrPieces(struct config board, bool type) 
+static int nbrPieces(struct config board, bool type) 
 {
     int i, j, nbr = 0;
     if(type)
@@ -101,7 +101,7 @@ int nbrPieces(struct config board, bool type)
 }
 
 
-int estim(struct config board) 
+static int estim(struct config board) 
 {
     int i, j;
     int matrice = 0;

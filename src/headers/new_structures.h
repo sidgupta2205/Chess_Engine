@@ -8,26 +8,26 @@ struct config {
 };
 
 
-int PawnIsolated = -30;
+static int PawnIsolated = -30;
 
 
-int PawnDouble = -30;
+static int PawnDouble = -30;
 
 
-int RookOpenFile = 70;
+static int RookOpenFile = 70;
 
 
-int RookSemiOpenFile = 50;
+static int RookSemiOpenFile = 50;
 
 
-int QueenOpenFile = 50;
+static int QueenOpenFile = 50;
 
 
-int QueenSemiOpenFile = 30;
+static int QueenSemiOpenFile = 30;
 
 
-int BishopPair = 50;
-int PawnTable[64] = {
+static int BishopPair = 50;
+static int PawnTable[64] = {
 	0	    ,  	0   	,   0   	,   0   	,   0   	,  	0	    ,	0	    ,	0	    ,
 	50	    ,  	50	    ,   0	    ,   -10     ,   -10     ,  	0	    ,	50	    ,	50	    ,
 	25	    ,  	0	    ,  	0	    ,  	25	    ,  	25	    ,  	0	    ,	0	    ,	25	    ,
@@ -38,7 +38,7 @@ int PawnTable[64] = {
 	0	    ,  	0	    ,  	0	    ,  	0	    ,  	0	    ,  	0	    ,	0	    ,	0
 };
 
-int KnightTable[64] = {
+static int KnightTable[64] = {
 	0   	,	-50	    ,	0	    ,	0	    ,	0	    ,	0	    ,	-50 	,	0   	,
 	0   	,	0	    ,	0	    ,	25	    ,	25	    ,	0	    ,	0	    ,	0   	,
 	0	    ,	0	    ,	50	    ,	50	    ,	50	    ,	50	    ,	0	    ,	0	    ,
@@ -49,7 +49,7 @@ int KnightTable[64] = {
 	0	    ,	0	    ,	0	    ,	0	    ,	0	    ,	0	    ,	0	    ,	0
 };
 
-int BishopTable[64] = {
+static int BishopTable[64] = {
 	0	    ,	0	    ,	-50	    ,	0	    ,	0	    ,	-50	    ,	0	    ,	0   	,
 	0	    ,  	0	    ,	0	    ,	50	    ,	50	    ,	0	    ,	0	    ,	0	    ,
 	0	    ,	0	    ,	50	    ,	70	    ,	70	    ,	50  	,	0	    ,	0	    ,
@@ -60,7 +60,7 @@ int BishopTable[64] = {
 	0	    ,	0   	,	0	    ,	0	    ,	0	    ,	0   	,	0	    ,	0
 };
 
-int RookTable[64] = {
+static int RookTable[64] = {
     0   	,	0	    ,	25  	,	50	    ,	50	    ,	25	    ,	0	    ,	0	    ,
 	0	    ,	0	    ,	25	    ,	50	    ,	50	    ,	25	    ,	0	    ,	0   	,
 	0	    ,	0	    ,	25	    ,	50	    ,	50	    ,	25	    ,	0	    ,	0	    ,
@@ -71,7 +71,7 @@ int RookTable[64] = {
 	0	    ,	0	    ,	25	    ,	50	    ,	50	    ,	25	    ,	0	    ,	0
 };
 
-int KingE[64] = {
+static int KingE[64] = {
 	-500    ,	-50	    ,	0   	,	0   	,	0   	,	0   	,	-50	    ,	-500	,
 	-50     ,	0	    ,	50 	    ,	50	    ,	50	    ,	50	    ,	0   	,	-50     ,
 	0	    ,	50	    ,	90	    ,	90	    ,	90	    ,	90	    ,	50	    ,	0	    ,
@@ -82,7 +82,7 @@ int KingE[64] = {
 	-500 	,	-50	    ,	0	    ,	0	    ,	0	    ,	0	    ,	-50	    ,	-500
 };
 
-int KingO[64] = {
+static int KingO[64] = {
 	0	    ,	25	    ,	25	    ,	-50     ,	-50 	,	0	    ,	50	    ,	25	    ,
 	-300	,	-300	,	-300	,	-300	,	-300	,	-300	,	-300	,	-300	,
 	-500	,	-500	,	-500	,	-500	,	-500	,	-500	,	-500	,	-500	,
@@ -93,14 +93,14 @@ int KingO[64] = {
 	-700	,	-700	,	-700	,	-700	,	-700	,	-700	,	-700	,	-700
 };
 
-int dC[8][2] = { {-2,+1} , {-1,+2} , {+1,+2} , {+2,+1} , {+2,-1} , {+1,-2} , {-1,-2} , {-2,-1} };
+static int dC[8][2] = { {-2,+1} , {-1,+2} , {+1,+2} , {+2,+1} , {+2,-1} , {+1,-2} , {-1,-2} , {-2,-1} };
 
-int D[8][2] = { {+1,0} , {+1,+1} , {0,+1} , {-1,+1} , {-1,0} , {-1,-1} , {0,-1} , {+1,-1} }; 
+static int D[8][2] = { {+1,0} , {+1,+1} , {0,+1} , {-1,+1} , {-1,0} , {-1,-1} , {0,-1} , {+1,-1} }; 
 
 
 // Intialising Structures
 
-void init( struct config *conf )
+static void init( struct config *conf )
 {
    	int i, j;
 
@@ -128,7 +128,7 @@ void init( struct config *conf )
 } 
 
 
-void affich( struct config conf )
+static void affich( struct config conf )
 {
 	int i, j, k;
 	for (i=0;  i<8; i++)
@@ -164,11 +164,79 @@ void affich( struct config conf )
 
 
 
-int comp (const void * elem1, const void * elem2) 
+static int comp (const void * elem1, const void * elem2) 
 {
     struct config f = *((struct config *)elem1);
     struct config s = *((struct config *)elem2);
     if (f.val < s.val) return  1;
     if (f.val > s.val) return -1;
     return 0;
+}
+
+
+static void rand_init(struct config *conf) {
+    int i, j;
+
+    // Clear the board
+    for (i = 0; i < 8; i++) {
+        for (j = 0; j < 8; j++) {
+            conf->mat[i][j] = 0;
+        }
+    }
+
+    // Set the pieces to the standard starting position
+    conf->mat[0][0] = 't';
+    conf->mat[0][1] = 'c';
+    conf->mat[0][2] = 'f';
+    conf->mat[0][3] = 'n';
+    conf->mat[0][4] = 'r';
+    conf->mat[0][5] = 'f';
+    conf->mat[0][6] = 'c';
+    conf->mat[0][7] = 't';
+    conf->mat[1][0] = 'p';
+    conf->mat[1][1] = 'p';
+    conf->mat[1][2] = 'p';
+    conf->mat[1][3] = 'p';
+    conf->mat[1][4] = 'p';
+    conf->mat[5][5] = 'p';
+    conf->mat[1][6] = 'p';
+    conf->mat[1][7] = 'p';
+    conf->mat[7][0] = -'t';
+    conf->mat[7][1] = -'c';
+    conf->mat[7][2] = -'f';
+    conf->mat[7][3] = -'r';
+    conf->mat[7][4] = -'n';
+    conf->mat[7][5] = -'f';
+    conf->mat[7][6] = -'c';
+    conf->mat[7][7] = -'t';
+    conf->mat[6][0] = -'p';
+    conf->mat[6][1] = -'p';
+    conf->mat[6][2] = -'p';
+    conf->mat[5][3] = -'p';
+    conf->mat[6][4] = -'p';
+    conf->mat[6][5] = -'p';
+    conf->mat[6][6] = -'p';
+    conf->mat[6][7] = -'p';
+
+    // Set the kings to a random position
+    srand(time(NULL));
+    int xB = rand() % 8;
+    int yB = rand() % 8;
+    int xN = rand() % 8;
+    int yN = rand() % 8;
+    conf->mat[xB][yB] = 'k';
+    conf->xrB = xB;
+    conf->yrB = yB;
+    conf->mat[xN][yN] = -'k';
+    conf->xrN = xN;
+    conf->yrN = yN;
+
+    // Set the other variables
+   conf->xrB = 0; conf->yrB = 4;
+	conf->xrN = 7; conf->yrN = 4;
+
+	conf->roqueB = 'r';
+	conf->roqueN = 'r';
+
+	conf->val = 0;
 }
