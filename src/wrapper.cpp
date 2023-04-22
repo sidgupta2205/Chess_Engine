@@ -8,44 +8,258 @@
 #include "headers/wrapper.h"
 
 void MPI_Bcast(params &p,int ld,int os,int val ) {
-    int i, cout;
-   long local_nb_node1 = 0, local_nb_sec1= 0, local_nb_sec2 = 0, local_nb_node2 = 0;
-    #pragma omp parallel private(local_nb_node2, local_nb_sec2, local_nb_node1, local_nb_sec1)
+
+    if(os==1)
+        return;
+
+    if(p.id==1)
     {
-        #pragma omp for schedule(dynamic)
-        for (i = 0; i < p.n; i++) {
-            if (p.mode == MAX) {
-                local_nb_sec1 = 0;
-                local_nb_node1 = 0;
-                cout = minmax_ab(p.T[i], MIN, p.depth - 1, p.alpha, p.beta, &local_nb_node1, &local_nb_sec1);
-                #pragma omp critical
-                {
-                    if (cout > p.score) {
-                        p.alpha = cout;
-                        p.score = cout;
-                        p.j = i;
+        int i, cout;
+        long local_nb_node1 = 0, local_nb_sec1= 0, local_nb_sec2 = 0, local_nb_node2 = 0;
+        #pragma omp parallel private(local_nb_node2, local_nb_sec2, local_nb_node1, local_nb_sec1)
+        {
+            #pragma omp for schedule(dynamic)
+            for (i = 0; i < p.n; i++) {
+                if (p.mode == MAX) {
+                    local_nb_sec1 = 0;
+                    local_nb_node1 = 0;
+                    cout = minmax_ab(p.T[i], MIN, p.depth - 1, p.alpha, p.beta, &local_nb_node1, &local_nb_sec1);
+                    #pragma omp critical
+                    {
+                        if (cout > p.score) {
+                            p.alpha = cout;
+                            p.score = cout;
+                            p.j = i;
+                        }
+                        p.nb_node1 += local_nb_node1;
+                        p.nb_sec1 += local_nb_sec1;
                     }
-                    p.nb_node1 += local_nb_node1;
-                    p.nb_sec1 += local_nb_sec1;
-                }
-            } else {
-                local_nb_sec2 = 0;
-                local_nb_node2 = 0;
-                cout = minmax_ab2(p.T[i], MAX, p.depth - 1, p.alpha, p.beta, &local_nb_node2, &local_nb_sec2);
-                #pragma omp critical
-                {
-                    if (cout < p.score) {
-                        p.beta = cout;
-                        p.score = cout;
-                        p.j = i;
+                } else {
+                    local_nb_sec2 = 0;
+                    local_nb_node2 = 0;
+                    cout = minmax_ab2(p.T[i], MAX, p.depth - 1, p.alpha, p.beta, &local_nb_node2, &local_nb_sec2);
+                    #pragma omp critical
+                    {
+                        if (cout < p.score) {
+                            p.beta = cout;
+                            p.score = cout;
+                            p.j = i;
+                        }
+                        p.nb_sec2 += local_nb_sec2;
+                        p.nb_node2 += local_nb_node2;
                     }
-                    p.nb_sec2 += local_nb_sec2;
-                    p.nb_node2 += local_nb_node2;
                 }
             }
         }
     }
+
+    else if(p.id==2)
+    {
+        int i, cout;
+        long local_nb_node1 = 0, local_nb_sec1= 0, local_nb_sec2 = 0, local_nb_node2 = 0;
+        #pragma omp parallel private (local_nb_node2, local_nb_sec2, local_nb_node1, local_nb_sec1) if (p.mode == MIN)
+		{
+		
+			#pragma omp for schedule(dynamic)
+            for (i = 0; i < p.n; i++) {
+                if (p.mode == MAX) {
+                    local_nb_sec1 = 0;
+                    local_nb_node1 = 0;
+                    cout = minmax_ab(p.T[i], MIN, p.depth - 1, p.alpha, p.beta, &local_nb_node1, &local_nb_sec1);
+                    #pragma omp critical
+                    {
+                        if (cout > p.score) {
+                            p.alpha = cout;
+                            p.score = cout;
+                            p.j = i;
+                        }
+                        p.nb_node1 += local_nb_node1;
+                        p.nb_sec1 += local_nb_sec1;
+                    }
+                } else {
+                    local_nb_sec2 = 0;
+                    local_nb_node2 = 0;
+                    cout = minmax_ab2(p.T[i], MAX, p.depth - 1, p.alpha, p.beta, &local_nb_node2, &local_nb_sec2);
+                    #pragma omp critical
+                    {
+                        if (cout < p.score) {
+                            p.beta = cout;
+                            p.score = cout;
+                            p.j = i;
+                        }
+                        p.nb_sec2 += local_nb_sec2;
+                        p.nb_node2 += local_nb_node2;
+                    }
+                }
+            }
+		}
+    }
+
+    else if(p.id==3)
+    {
+        int i, cout;
+        long local_nb_node1 = 0, local_nb_sec1= 0, local_nb_sec2 = 0, local_nb_node2 = 0;
+        #pragma omp parallel private (local_nb_node2, local_nb_sec2, local_nb_node1, local_nb_sec1)
+		{
+		
+			#pragma omp for schedule(dynamic)
+            for (i = 0; i < p.n; i++) {
+                if (p.mode == MAX) {
+                    local_nb_sec1 = 0;
+                    local_nb_node1 = 0;
+                    cout = minmax_ab(p.T[i], MIN, p.depth - 1, p.alpha, p.beta, &local_nb_node1, &local_nb_sec1);
+                    #pragma omp critical
+                    {
+                        if (cout > p.score) {
+                            p.alpha = cout;
+                            p.score = cout;
+                            p.j = i;
+                        }
+                        p.nb_node1 += local_nb_node1;
+                        p.nb_sec1 += local_nb_sec1;
+                    }
+                } else {
+                    local_nb_sec2 = 0;
+                    local_nb_node2 = 0;
+                    cout = minmax_ab2(p.T[i], MAX, p.depth - 1, p.alpha, p.beta, &local_nb_node2, &local_nb_sec2);
+                    #pragma omp critical
+                    {
+                        if (cout < p.score) {
+                            p.beta = cout;
+                            p.score = cout;
+                            p.j = i;
+                        }
+                        p.nb_sec2 += local_nb_sec2;
+                        p.nb_node2 += local_nb_node2;
+                    }
+                }
+            }
+		}
+    }
+    else if(p.id==4)
+    {
+        int i, cout;
+        long local_nb_node1 = 0, local_nb_sec1= 0, local_nb_sec2 = 0, local_nb_node2 = 0;
+        #pragma omp parallel private (local_nb_node2, local_nb_sec2, local_nb_node1, local_nb_sec1) if (p.mode == MIN)
+		{
+		
+			#pragma omp for schedule(dynamic)
+            for (i = 0; i < p.n; i++) {
+                if (p.mode == MAX) {
+                    local_nb_sec1 = 0;
+                    local_nb_node1 = 0;
+                    cout = minmax_ab(p.T[i], MIN, p.depth - 1, p.alpha, p.beta, &local_nb_node1, &local_nb_sec1);
+                    #pragma omp critical
+                    {
+                        if (cout > p.score) {
+                            p.alpha = cout;
+                            p.score = cout;
+                            p.j = i;
+                        }
+                        p.nb_node1 += local_nb_node1;
+                        p.nb_sec1 += local_nb_sec1;
+                    }
+                } else {
+                    local_nb_sec2 = 0;
+                    local_nb_node2 = 0;
+                    cout = minmax_ab(p.T[i], MAX, p.depth - 1, p.alpha, p.beta, &local_nb_node2, &local_nb_sec2);
+                    #pragma omp critical
+                    {
+                        if (cout < p.score) {
+                            p.beta = cout;
+                            p.score = cout;
+                            p.j = i;
+                        }
+                        p.nb_sec2 += local_nb_sec2;
+                        p.nb_node2 += local_nb_node2;
+                    }
+                }
+            }
+		}
+    }
+
+    else if(p.id==5)
+    {
+        int i, cout;
+        long local_nb_node1 = 0, local_nb_sec1= 0, local_nb_sec2 = 0, local_nb_node2 = 0;
+        #pragma omp parallel private (local_nb_node2, local_nb_sec2, local_nb_node1, local_nb_sec1)
+		{
+			#pragma omp for schedule(dynamic)
+            for (i = 0; i < p.n; i++) {
+                if (p.mode == MAX) {
+                    local_nb_sec1 = 0;
+                    local_nb_node1 = 0;
+                    cout = minmax_ab(p.T[i], MIN, p.depth - 1, p.alpha, p.beta, &local_nb_node1, &local_nb_sec1);
+                    #pragma omp critical
+                    {
+                        if (cout > p.score) {
+                            p.alpha = cout;
+                            p.score = cout;
+                            p.j = i;
+                        }
+                        p.nb_node1 += local_nb_node1;
+                        p.nb_sec1 += local_nb_sec1;
+                    }
+                } else {
+                    local_nb_sec2 = 0;
+                    local_nb_node2 = 0;
+                    cout = iterative_deepening(p.T[i], MAX, p.depth - 1, p.alpha, p.beta, &local_nb_node2, &local_nb_sec2);
+                    #pragma omp critical
+                    {
+                        if (cout < p.score) {
+                            p.beta = cout;
+                            p.score = cout;
+                            p.j = i;
+                        }
+                        p.nb_sec2 += local_nb_sec2;
+                        p.nb_node2 += local_nb_node2;
+                    }
+                }
+            }
+		}
+    }
+   
 }
+
+void MPI_Init(int *, char*** argv)
+{
+    printf("Intializing process MPI\n");
+}
+    // srand(time(NULL));
+void MPI_Comm_size(int p, int *size)
+{
+    *size = 5;
+    printf("Intializing process 1\n");
+    printf("Intializing process 3\n");
+    printf("Intializing process 2\n");
+    printf("Intializing process 5\n");
+}
+void MPI_Comm_rank(int q, int* rank)
+{
+    *rank = 0;
+    return ;
+}
+
+void MPI_Barrier(int p)
+{
+    return;
+}
+
+MPI_Datatype::MPI_Datatype() {
+    return;
+}
+
+void MPI_Gather(void *, int, int,void* ,void*, int, int, int)
+{
+         return;   
+}
+
+void MPI_Finalize()
+{
+         return;   
+}
+
+
 
 // int main()
 // {

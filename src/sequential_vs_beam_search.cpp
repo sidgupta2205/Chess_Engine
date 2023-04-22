@@ -1,170 +1,262 @@
 #include "headers/compulsory_headers.h"
 #include "headers/generators.h"
+#include "headers/wrapper.h"
 
 
 int main( int argc, char *argv[] )
 {
+	params p;
+	p.id = 2;
 	char sy, dy, ch[10];
-	int sx, dx, n, i, j, score, stop, cout, cout2, legal, depth, sauter;
-	int cmin, cmax, mode, cpt;
+	int sx, dx, i, score, stop, cout, cout2, legal, sauter;
+	int cmin, cmax, cpt;
    	double stats1[100];
 	double stats2[100];
-	long nb_node1=0;
-	long nb_node2=0;
-	long nb_sec1 = 0;
-	long nb_sec2 = 0;
-
-
-   struct config T[100], conf, conf1;
-
+	p.nb_node1=0;
+	p.nb_node2=0;
+	p.nb_sec1 = 0;
+	p.nb_sec2 = 0;
+	
+   struct config conf, conf1;
+   
+   	int size, rank;
+    int div;
+    int mod;
+   	
+	MPI_Init(&argc, &argv);
+    // srand(time(NULL));
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	printf("%d",rank);
    if ( argc == 1 ) 
-	depth = 5;  
+	p.depth = 5;  
    else
-	depth = atoi( argv[1] ); 
-
-   printf("\n\nProfondeur d'exploration = %d\n\n", depth);
-
+	p.depth = atoi( argv[1] ); 
+   
+   printf("\n \nDepthOfExploration = %d\n\n", p.depth);
    
    init( &conf );
-  
-   
-
-   
    stop = 0;
-   mode = MAX;
+   p.mode = MAX;
    
    struct timeval begin, end;
-   int alpha, beta;
    double result;
    cpt = 0;
-   nb_node1=0;
-   nb_node2=0;
-   long local_nb_node1 = 0, local_nb_sec1= 0, local_nb_sec2 = 0, local_nb_node2 = 0;
+   p.nb_node1=0;
+   p.nb_node2=0;
+	
+	int remaining = 10%size;
 
    while (!stop && (cpt < 50))
    {
-	    alpha= -INFINI;
-		beta= +INFINI;
 
-		affich( conf );
-		printf("Tour: %d\n", cpt);
-		
-		generer_succ(conf, mode, T, &n);
-		
-		score = -INFINI*mode;
-		j = -1;
-		
-		gettimeofday(&begin, NULL);
-		#pragma omp parallel private (local_nb_node2, local_nb_sec2, local_nb_node1, local_nb_sec1) if (mode == MIN)
+		if(rank==0)
 		{
-		
-			#pragma omp for  schedule (dynamic) 
-			for (i=0; i<n; i++) 
+			p.alpha= -INFINI;
+			p.beta= +INFINI;
+
+			affich( conf );
+
+			printf("%d\n", cpt);
+			
+			generer_succ(conf, p.mode, p.T, &p.n);
+			
+			p.score = -INFINI*p.mode;
+			p.j = -1;
+			
+			gettimeofday(&begin, NULL);
+		}
+	    
+
+    	MPI_Bcast(p,1,0,MPI_COMM_WORLD);
+
+		//dummy code
+
+		long local_nb_node1 = 0, local_nb_sec1= 0, local_nb_sec2 = 0, local_nb_node2 = 0;
+
+		struct Temple_return temp;
+		struct Temple_return* tempResultroot  = new Temple_return[10];
+
+		if(rank>0 and p.mode==MIN)
+		{
+			int s  = p.n%rank;
+			int e = (p.n+1)%rank;
+			if(rank==size-1)
+				e = e+remaining;
+
+			for (i=s; i<e; i++) 
 			{
 				
-				if (mode == MAX)
+				if (p.mode == MAX)
 				{
 
 					local_nb_sec1 = 0;
 					local_nb_node1 = 0;
 					
-					cout = minmax_ab(T[i], MIN, depth-1, alpha, beta, &local_nb_node1, &local_nb_sec1);
-					#pragma omp critical
-					{
-						if (cout > score) 
+					cout = minmax_ab(p.T[i], MIN, p.depth-1, p.alpha, p.beta, &local_nb_node1, &local_nb_sec1);
+
+					// modify the shared variable
+					if (cout > temp.val) 
 						{  		
-							alpha =  cout;
-							score = cout;
-							j = i;
+							p.alpha =  cout;
+							p.score = cout;
+							p.j = i;
+							temp.val = cout;
+							temp.T = p.T[i];
 						}
-						nb_node1 += local_nb_node1;
-						nb_sec1 += local_nb_sec1;
-						
-					}
+						p.nb_node1 += local_nb_node1;
+						p.nb_sec1 += local_nb_sec1;
+					// exit the critical section
+
+				}
+				else
+				{
+					local_nb_sec1 = 0;
+					local_nb_node1 = 0;
+					
+					cout = minmax_ab(p.T[i], MIN, p.depth-1, p.alpha, p.beta, &local_nb_node1, &local_nb_sec1);
+
+					// modify the shared variable
+					if (cout < score) 
+						{  		
+							p.alpha =  cout;
+							p.score = cout;
+							temp.val = cout;
+							temp.T = p.T[i];
+						}
+						p.nb_node1 += local_nb_node1;
+						p.nb_sec1 += local_nb_sec1;
+					
+				}
 				
+			}
+		}
+
+		else if(p.mode==MAX and rank>0)
+		{
+			int s  = p.n%rank;
+			int e = (p.n+1)%rank;
+			if(rank==size-1)
+				e = e+remaining;
+
+			for (i=s; i<e; i++) 
+			{
+				
+				if (p.mode == MAX)
+				{
+
+					local_nb_sec2 = 0;
+					local_nb_node2 = 0;
+					
+					cout = minmax_ab(p.T[i], MIN, p.depth-1, p.alpha, p.beta, &local_nb_node2, &local_nb_sec2);
+
+					// modify the shared variable
+					if (cout > temp.val) 
+						{  		
+							p.alpha =  cout;
+							p.score = cout;
+							p.j = i;
+							temp.val = cout;
+							temp.T = p.T[i];
+						}
+						p.nb_node2 += local_nb_node2;
+						p.nb_sec2 += local_nb_sec2;
+					// exit the critical section
 
 				}
 				else
 				{
 					local_nb_sec2 = 0;
 					local_nb_node2 = 0;
-					cout = minmax_ab2(T[i], MAX, depth-1, alpha, beta, &local_nb_node2, &local_nb_sec2);
 					
-					#pragma omp critical
-					{
-						if ( cout < score ) 
-						{  
-							beta = cout;
-							score = cout;
-							j = i;
+					cout = minmax_ab(p.T[i], MIN, p.depth-1, p.alpha, p.beta, &local_nb_node2, &local_nb_sec2);
+
+					// modify the shared variable
+					if (cout < score) 
+						{  		
+							p.alpha =  cout;
+							p.score = cout;
+							temp.val = cout;
+							temp.T = p.T[i];
 						}
-						nb_sec2 += local_nb_sec2;
-						nb_node2 += local_nb_node2;
-					}
+						p.nb_node2 += local_nb_node2;
+						p.nb_sec2 += local_nb_sec2;
 					
 				}
 				
 			}
 		}
-		gettimeofday(&end, NULL);
-		result = (double)(end.tv_usec - begin.tv_usec)/1000000 + end.tv_sec - begin.tv_sec;
-		if (mode == MAX)
-			stats1[cpt] = result;
-		else
-		{
-			stats2[cpt] = result;
-			cpt++;
+
+		// send best configuration to root process
+		MPI_Gather(&temp, sizeof(Temple_return), datatype, nullptr, tempResultroot, datatype, 0, MPI_COMM_WORLD);
+
+		// MPI_Barrier(MPI_COMM_WORLD);
+
+		if(rank==0){
+			compute_best_score(tempResultroot,p.n,&p.j,rank);
+			gettimeofday(&end, NULL);
+			result = (double)(end.tv_usec - begin.tv_usec)/1000000 + end.tv_sec - begin.tv_sec;
+			if (p.mode == MAX)
+				stats1[cpt] = result;
+			else
+			{
+				stats2[cpt] = result;
+				cpt++;
+			}
+			if ( p.j != -1 ) 
+			{ 
+				copier( &p.T[p.j], &conf );
+				conf.val = p.score;
+				
+			}
+			else 
+			{ 
+				printf(" *** J'ai perdu ***\n");
+				stop = 1;
+			}
 		}
+
+		MPI_Bcast(p,1,1,MPI_COMM_WORLD);
+		p.mode *= -1;
 		
-
-
-		if ( j != -1 ) 
-		{ 
-			copier( &T[j], &conf );
-			conf.val = score;
-			
-		}
-		else 
-		{ 
-			printf(" *** J'ai perdu ***\n");
-			stop = 1;
-		}
-	   mode *= -1;
-	  
    } 
+
+   if(rank==0)
+   {
+		int iiii;
+		char res[30];
+		FILE * f = fopen("results.txt", "w");
+
+		snprintf(res, 30, "%ld", p.nb_node1);
+		fputs(res, f);
+		fputs("\n", f);
+
+		snprintf(res, 30, "%ld", p.nb_node2);
+		fputs(res, f);
+		fputs("\n", f);
+
+
+
+		for (iiii = 0;iiii < cpt; iiii++)
+		{
+			snprintf(res, 30, "%f", stats1[iiii]);
+			fputs(res, f);
+			fputs(" ", f);
+		}
+
+		fputs("\n", f);
+		for (iiii = 0;iiii < cpt; iiii++)
+		{
+			snprintf(res, 30, "%f", stats2[iiii]);
+			fputs(res, f);
+			fputs(" ", f);
+		}
+
+		fclose(f);
+
+   }
+
+   MPI_Finalize();
+	return EXIT_SUCCESS;
    
-	int iiii;
-	char res[30];
-	FILE * f = fopen("results.txt", "w");
-
-	snprintf(res, 30, "%ld", nb_node1);
-	fputs(res, f);
-	fputs("\n", f);
-
-	snprintf(res, 30, "%ld", nb_node2);
-	fputs(res, f);
-	fputs("\n", f);
-
-	
-
-	for (iiii = 0;iiii < cpt; iiii++)
-	{
-		snprintf(res, 30, "%f", stats1[iiii]);
-		fputs(res, f);
-		fputs(" ", f);
-	}
-
-	fputs("\n", f);
-	for (iiii = 0;iiii < cpt; iiii++)
-	{
-		snprintf(res, 30, "%f", stats2[iiii]);
-		fputs(res, f);
-		fputs(" ", f);
-	}
-
-	fclose(f);
-
-	return 0;
 }
-
-

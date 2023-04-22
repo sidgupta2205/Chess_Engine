@@ -1,6 +1,22 @@
 #include "transforms_displacements.h"
 #include "definations.h"
 
+
+static void compute_best_score(Temple_return *t,int n,int* j,int r)
+{
+	if(r==0)
+		return;
+	int i;
+	for(i=0;i<n;i++)
+	{
+		if(t[i].val>t[*j].val)
+		{
+			*j=i;
+		}
+	}
+	
+}
+
 static void generer_succ( struct config conf, int mode, struct config T[], int *n )
 {
 	int i, j, k, stop;

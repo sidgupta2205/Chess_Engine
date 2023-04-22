@@ -6,7 +6,12 @@ struct config {
 	char xrN, yrN, xrB, yrB;
 	char roqueN, roqueB;	
 };
-
+ 
+struct Temple_return
+{
+	int val;
+	config T;
+};
 
 static int PawnIsolated = -30;
 
