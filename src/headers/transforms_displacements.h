@@ -6,26 +6,26 @@ static void transformPion( struct config conf, int a, int b, int x, int y, struc
 	if (conf.mat[a][b] < 0 ) signe = -1;
 	copier(&conf, &T[*n]);
 	T[*n].mat[a][b] = 0;
-	T[*n].mat[x][y] = signe *'n';
+	T[*n].mat[x][y] = signe *'q';
 	(*n)++;
 	copier(&conf, &T[*n]);
 	T[*n].mat[a][b] = 0;
-	T[*n].mat[x][y] = signe *'c';
+	T[*n].mat[x][y] = signe *'k';
 	(*n)++;
 	copier(&conf, &T[*n]);
 	T[*n].mat[a][b] = 0;
-	T[*n].mat[x][y] = signe *'f';
+	T[*n].mat[x][y] = signe *'b';
 	(*n)++;
 	copier(&conf, &T[*n]);
 	T[*n].mat[a][b] = 0;
-	T[*n].mat[x][y] = signe *'t';
+	T[*n].mat[x][y] = signe *'r';
 	(*n)++;
 
 } 
 
 
 
-static int caseMenaceePar( int mode, int x, int y, struct config conf )
+static int threatened_square( int mode, int x, int y, struct config conf )
 {
 	int i, j, a, b, stop;
 
@@ -35,13 +35,13 @@ static int caseMenaceePar( int mode, int x, int y, struct config conf )
 	   a = x + D[i][0];
 	   b = y + D[i][1];	  	 
 	   if ( a >= 0 && a <= 7 && b >= 0 && b <= 7 ) 
-		if ( conf.mat[a][b]*mode == 'r' ) return 1;
+		if ( conf.mat[a][b]*mode == 'e' ) return 1;
 	} 
 
 	
 	for (i=0; i<8; i++)
 	   if ( x+dC[i][0] <= 7 && x+dC[i][0] >= 0 && y+dC[i][1] <= 7 && y+dC[i][1] >= 0 )
-		if ( conf.mat[ x+dC[i][0] ] [ y+dC[i][1] ] * mode == 'c' )  
+		if ( conf.mat[ x+dC[i][0] ] [ y+dC[i][1] ] * mode == 'k' )  
 		   return 1;
 
 	
@@ -63,9 +63,9 @@ static int caseMenaceePar( int mode, int x, int y, struct config conf )
 		    b = b + D[i][1];
 		}
 	   if ( stop )  {
-		if ( conf.mat[a][b]*mode == 'f' && i % 2 != 0 ) return 1; 
-		if ( conf.mat[a][b]*mode == 't' && i % 2 == 0 ) return 1;
-		if ( conf.mat[a][b]*mode == 'n' ) return 1;
+		if ( conf.mat[a][b]*mode == 'b' && i % 2 != 0 ) return 1; 
+		if ( conf.mat[a][b]*mode == 'r' && i % 2 == 0 ) return 1;
+		if ( conf.mat[a][b]*mode == 'q' ) return 1;
 	   }
 	} 
 	
@@ -77,7 +77,7 @@ static int caseMenaceePar( int mode, int x, int y, struct config conf )
 
 
 
-static void deplacementsN(struct config conf, int x, int y, struct config T[], int *n )
+static void displacementsBl(struct config conf, int x, int y, struct config T[], int *n )
 {
 	int i, j, a, b, stop;
 
@@ -103,8 +103,8 @@ static void deplacementsN(struct config conf, int x, int y, struct config T[], i
 			T[*n].mat[x][y] = 0;
 			T[*n].mat[x-1][y-1] = -'p';
 			
-			if (T[*n].xrB == x-1 && T[*n].yrB == y-1) { 
-				T[*n].xrB = -1; T[*n].yrB = -1; 
+			if (T[*n].xkingW == x-1 && T[*n].ykingW == y-1) { 
+				T[*n].xkingW = -1; T[*n].ykingW = -1; 
 			}
 
 			(*n)++;
@@ -115,8 +115,8 @@ static void deplacementsN(struct config conf, int x, int y, struct config T[], i
 			T[*n].mat[x][y] = 0;
 			T[*n].mat[x-1][y+1] = -'p';
 			
-			if (T[*n].xrB == x-1 && T[*n].yrB == y+1) { 
-				T[*n].xrB = -1; T[*n].yrB = -1; 
+			if (T[*n].xkingW == x-1 && T[*n].ykingW == y+1) { 
+				T[*n].xkingW = -1; T[*n].ykingW = -1; 
 			}
 
 			(*n)++;
@@ -125,16 +125,16 @@ static void deplacementsN(struct config conf, int x, int y, struct config T[], i
 		break;
 
 	
-	case -'c' : 
+	case -'k' : 
 		for (i=0; i<8; i++)
 		   if ( x+dC[i][0] <= 7 && x+dC[i][0] >= 0 && y+dC[i][1] <= 7 && y+dC[i][1] >= 0 )
 			if ( conf.mat[ x+dC[i][0] ] [ y+dC[i][1] ] >= 0 )  {
 			   copier(&conf, &T[*n]);
 			   T[*n].mat[x][y] = 0;
-			   T[*n].mat[ x+dC[i][0] ][ y+dC[i][1] ] = -'c';
+			   T[*n].mat[ x+dC[i][0] ][ y+dC[i][1] ] = -'k';
 			   
-			   if (T[*n].xrB == x+dC[i][0] && T[*n].yrB == y+dC[i][1]) { 
-				T[*n].xrB = -1; T[*n].yrB = -1; 
+			   if (T[*n].xkingW == x+dC[i][0] && T[*n].ykingW == y+dC[i][1]) { 
+				T[*n].xkingW = -1; T[*n].ykingW = -1; 
 			   }
 
 			   (*n)++;
@@ -142,7 +142,7 @@ static void deplacementsN(struct config conf, int x, int y, struct config T[], i
 		break;
 
 	
-	case -'f' : 
+	case -'b' : 
 		for (i=1; i<8; i += 2) {
 		   
 		   stop = 0;
@@ -154,70 +154,9 @@ static void deplacementsN(struct config conf, int x, int y, struct config T[], i
 			   copier(&conf, &T[*n]);
 			   T[*n].mat[x][y] = 0;
 			   if ( T[*n].mat[a][b] > 0 ) stop = 1;
-			   T[*n].mat[a][b] = -'f';
+			   T[*n].mat[a][b] = -'b';
 			   
-			   if (T[*n].xrB == a && T[*n].yrB == b) { T[*n].xrB = -1; T[*n].yrB = -1; }
-
-			   (*n)++;
-		   	   a = a + D[i][0];
-		   	   b = b + D[i][1];
-			}
-		   } 
-		} 
-		break;
-
-	
-	case -'t' : 
-		for (i=0; i<8; i += 2) {
-		   
-		   stop = 0;
-		   a = x + D[i][0];
-		   b = y + D[i][1];	  	 
-		   while ( !stop && a >= 0 && a <= 7 && b >= 0 && b <= 7 ) {
-			if ( conf.mat[ a ] [ b ] < 0 )  stop = 1;
-			else {
-			   copier(&conf, &T[*n]);
-			   T[*n].mat[x][y] = 0;
-			   if ( T[*n].mat[a][b] > 0 ) stop = 1;
-			   T[*n].mat[a][b] = -'t';
-			   
-			   if (T[*n].xrB == a && T[*n].yrB == b) { T[*n].xrB = -1; T[*n].yrB = -1; }
-
-			   if ( conf.roqueN != 'e' && conf.roqueN != 'n' ) {
-			      if ( x == 7 && y == 0 && conf.roqueN != 'p')
-			   	T[*n].roqueN = 'g'; 
-			      else if ( x == 7 && y == 0 )
-			   	   T[*n].roqueN = 'n'; 
-			      if ( x == 7 && y == 7 && conf.roqueN != 'g' )
-			   	T[*n].roqueN = 'p'; 
-			      else if ( x == 7 && y == 7 )
-			   	   T[*n].roqueN = 'n'; 
-			   }
-
-			   (*n)++;
-		   	   a = a + D[i][0];
-		   	   b = b + D[i][1];
-			}
-		   } 
-		} 
-		break;
-
-	
-	case -'n' : 
-		for (i=0; i<8; i += 1) {
-		   
-		   stop = 0;
-		   a = x + D[i][0];
-		   b = y + D[i][1];	  	 
-		   while ( !stop && a >= 0 && a <= 7 && b >= 0 && b <= 7 ) {
-			if ( conf.mat[ a ] [ b ] < 0 )  stop = 1;
-			else {
-			   copier(&conf, &T[*n]);
-			   T[*n].mat[x][y] = 0;
-			   if ( T[*n].mat[a][b] > 0 ) stop = 1;
-			   T[*n].mat[a][b] = -'n';
-			   
-			   if (T[*n].xrB == a && T[*n].yrB == b) { T[*n].xrB = -1; T[*n].yrB = -1; }
+			   if (T[*n].xkingW == a && T[*n].ykingW == b) { T[*n].xkingW = -1; T[*n].ykingW = -1; }
 
 			   (*n)++;
 		   	   a = a + D[i][0];
@@ -229,30 +168,91 @@ static void deplacementsN(struct config conf, int x, int y, struct config T[], i
 
 	
 	case -'r' : 
+		for (i=0; i<8; i += 2) {
+		   
+		   stop = 0;
+		   a = x + D[i][0];
+		   b = y + D[i][1];	  	 
+		   while ( !stop && a >= 0 && a <= 7 && b >= 0 && b <= 7 ) {
+			if ( conf.mat[ a ] [ b ] < 0 )  stop = 1;
+			else {
+			   copier(&conf, &T[*n]);
+			   T[*n].mat[x][y] = 0;
+			   if ( T[*n].mat[a][b] > 0 ) stop = 1;
+			   T[*n].mat[a][b] = -'r';
+			   
+			   if (T[*n].xkingW == a && T[*n].ykingW == b) { T[*n].xkingW = -1; T[*n].ykingW = -1; }
+
+			   if ( conf.castlingB != 'e' && conf.castlingB != 'q' ) {
+			      if ( x == 7 && y == 0 && conf.castlingB != 'p')
+			   	T[*n].castlingB = 'g'; 
+			      else if ( x == 7 && y == 0 )
+			   	   T[*n].castlingB = 'q'; 
+			      if ( x == 7 && y == 7 && conf.castlingB != 'g' )
+			   	T[*n].castlingB = 'p'; 
+			      else if ( x == 7 && y == 7 )
+			   	   T[*n].castlingB = 'q'; 
+			   }
+
+			   (*n)++;
+		   	   a = a + D[i][0];
+		   	   b = b + D[i][1];
+			}
+		   } 
+		} 
+		break;
+
+	
+	case -'q' : 
+		for (i=0; i<8; i += 1) {
+		   
+		   stop = 0;
+		   a = x + D[i][0];
+		   b = y + D[i][1];	  	 
+		   while ( !stop && a >= 0 && a <= 7 && b >= 0 && b <= 7 ) {
+			if ( conf.mat[ a ] [ b ] < 0 )  stop = 1;
+			else {
+			   copier(&conf, &T[*n]);
+			   T[*n].mat[x][y] = 0;
+			   if ( T[*n].mat[a][b] > 0 ) stop = 1;
+			   T[*n].mat[a][b] = -'q';
+			   
+			   if (T[*n].xkingW == a && T[*n].ykingW == b) { T[*n].xkingW = -1; T[*n].ykingW = -1; }
+
+			   (*n)++;
+		   	   a = a + D[i][0];
+		   	   b = b + D[i][1];
+			}
+		   } 
+		} 
+		break;
+
+	
+	case -'e' : 
 		
-		if ( conf.roqueN != 'n' && conf.roqueN != 'e' ) {
-		   if ( conf.roqueN != 'g' && conf.mat[7][1] == 0 && conf.mat[7][2] == 0 && conf.mat[7][3] == 0 )
-		      if ( !caseMenaceePar( MAX, 7, 1, conf ) && !caseMenaceePar( MAX, 7, 2, conf ) && \
-			   !caseMenaceePar( MAX, 7, 3, conf ) && !caseMenaceePar( MAX, 7, 4, conf ) )  {
+		if ( conf.castlingB != 'q' && conf.castlingB != 'e' ) {
+		   if ( conf.castlingB != 'g' && conf.mat[7][1] == 0 && conf.mat[7][2] == 0 && conf.mat[7][3] == 0 )
+		      if ( !threatened_square( MAX, 7, 1, conf ) && !threatened_square( MAX, 7, 2, conf ) && \
+			   !threatened_square( MAX, 7, 3, conf ) && !threatened_square( MAX, 7, 4, conf ) )  {
 			
 			copier(&conf, &T[*n]);
 			T[*n].mat[7][4] = 0;
 			T[*n].mat[7][0] = 0;
-			T[*n].mat[7][2] = -'r'; T[*n].xrN = 7; T[*n].yrN = 2;
-			T[*n].mat[7][3] = -'t';
-			T[*n].roqueN = 'e'; 
+			T[*n].mat[7][2] = -'e'; T[*n].xkingB = 7; T[*n].ykingB = 2;
+			T[*n].mat[7][3] = -'r';
+			T[*n].castlingB = 'e'; 
 			(*n)++;
 		      }
-		   if ( conf.roqueN != 'p' && conf.mat[7][5] == 0 && conf.mat[7][6] == 0 )
-		      if ( !caseMenaceePar( MAX, 7, 4, conf ) && !caseMenaceePar( MAX, 7, 5, conf ) && \
-			   !caseMenaceePar( MAX, 7, 6, conf ) )  {
+		   if ( conf.castlingB != 'p' && conf.mat[7][5] == 0 && conf.mat[7][6] == 0 )
+		      if ( !threatened_square( MAX, 7, 4, conf ) && !threatened_square( MAX, 7, 5, conf ) && \
+			   !threatened_square( MAX, 7, 6, conf ) )  {
 			
 			copier(&conf, &T[*n]);
 			T[*n].mat[7][4] = 0;
 			T[*n].mat[7][7] = 0;
-			T[*n].mat[7][6] = -'r'; T[*n].xrN = 7; T[*n].yrN = 6;
-			T[*n].mat[7][5] = -'t';
-			T[*n].roqueN = 'e'; 
+			T[*n].mat[7][6] = -'e'; T[*n].xkingB = 7; T[*n].ykingB = 6;
+			T[*n].mat[7][5] = -'r';
+			T[*n].castlingB = 'e'; 
 			(*n)++;
 
 		      }
@@ -267,11 +267,11 @@ static void deplacementsN(struct config conf, int x, int y, struct config T[], i
 			if ( conf.mat[a][b] >= 0 ) {
 			   copier(&conf, &T[*n]);
 			   T[*n].mat[x][y] = 0;
-			   T[*n].mat[a][b] = -'r'; T[*n].xrN = a; T[*n].yrN = b;
+			   T[*n].mat[a][b] = -'e'; T[*n].xkingB = a; T[*n].ykingB = b;
 			   
-			   if (T[*n].xrB == a && T[*n].yrB == b) { T[*n].xrB = -1; T[*n].yrB = -1; }
+			   if (T[*n].xkingW == a && T[*n].ykingW == b) { T[*n].xkingW = -1; T[*n].ykingW = -1; }
 
-			   T[*n].roqueN = 'n'; 
+			   T[*n].castlingB = 'q'; 
 			   (*n)++;
 			}
 		} 
@@ -283,7 +283,7 @@ static void deplacementsN(struct config conf, int x, int y, struct config T[], i
 
 
 
-static void deplacementsB(struct config conf, int x, int y, struct config T[], int *n )
+static void displacementsW(struct config conf, int x, int y, struct config T[], int *n )
 {
 	int i, j, a, b, stop;
 
@@ -308,8 +308,8 @@ static void deplacementsB(struct config conf, int x, int y, struct config T[], i
 			T[*n].mat[x][y] = 0;
 			T[*n].mat[x+1][y-1] = 'p';
 			
-			if (T[*n].xrN == x+1 && T[*n].yrN == y-1) { 
-				T[*n].xrN = -1; T[*n].yrN = -1; 
+			if (T[*n].xkingB == x+1 && T[*n].ykingB == y-1) { 
+				T[*n].xkingB = -1; T[*n].ykingB = -1; 
 			}
 
 			(*n)++;
@@ -320,8 +320,8 @@ static void deplacementsB(struct config conf, int x, int y, struct config T[], i
 			T[*n].mat[x][y] = 0;
 			T[*n].mat[x+1][y+1] = 'p';
 			
-			if (T[*n].xrN == x+1 && T[*n].yrN == y+1) { 
-				T[*n].xrN = -1; T[*n].yrN = -1; 
+			if (T[*n].xkingB == x+1 && T[*n].ykingB == y+1) { 
+				T[*n].xkingB = -1; T[*n].ykingB = -1; 
 			}
 
 			(*n)++;
@@ -330,16 +330,16 @@ static void deplacementsB(struct config conf, int x, int y, struct config T[], i
 		break;
 
 	
-	case 'c' : 
+	case 'k' : 
 		for (i=0; i<8; i++)
 		   if ( x+dC[i][0] <= 7 && x+dC[i][0] >= 0 && y+dC[i][1] <= 7 && y+dC[i][1] >= 0 )
 			if ( conf.mat[ x+dC[i][0] ] [ y+dC[i][1] ] <= 0 )  {
 			   copier(&conf, &T[*n]);
 			   T[*n].mat[x][y] = 0;
-			   T[*n].mat[ x+dC[i][0] ][ y+dC[i][1] ] = 'c';
+			   T[*n].mat[ x+dC[i][0] ][ y+dC[i][1] ] = 'k';
 			   
-			   if (T[*n].xrN == x+dC[i][0] && T[*n].yrN == y+dC[i][1]) { 
-				T[*n].xrN = -1; T[*n].yrN = -1; 
+			   if (T[*n].xkingB == x+dC[i][0] && T[*n].ykingB == y+dC[i][1]) { 
+				T[*n].xkingB = -1; T[*n].ykingB = -1; 
 			   }
 
 			   (*n)++;
@@ -347,7 +347,7 @@ static void deplacementsB(struct config conf, int x, int y, struct config T[], i
 		break;
 
 	
-	case 'f' : 
+	case 'b' : 
 		for (i=1; i<8; i += 2) {
 		   
 		   stop = 0;
@@ -359,70 +359,9 @@ static void deplacementsB(struct config conf, int x, int y, struct config T[], i
 			   copier(&conf, &T[*n]);
 			   T[*n].mat[x][y] = 0;
 			   if ( T[*n].mat[a][b] < 0 ) stop = 1;
-			   T[*n].mat[a][b] = 'f';
+			   T[*n].mat[a][b] = 'b';
 			   
-			   if (T[*n].xrN == a && T[*n].yrN == b) { T[*n].xrN = -1; T[*n].yrN = -1; }
-
-			   (*n)++;
-		   	   a = a + D[i][0];
-		   	   b = b + D[i][1];
-			}
-		   } 
-		} 
-		break;
-
-	
-	case 't' : 
-		for (i=0; i<8; i += 2) {
-		   
-		   stop = 0;
-		   a = x + D[i][0];
-		   b = y + D[i][1];	  	 
-		   while ( !stop && a >= 0 && a <= 7 && b >= 0 && b <= 7 ) {
-			if ( conf.mat[ a ] [ b ] > 0 )  stop = 1;
-			else {
-			   copier(&conf, &T[*n]);
-			   T[*n].mat[x][y] = 0;
-			   if ( T[*n].mat[a][b] < 0 ) stop = 1;
-			   T[*n].mat[a][b] = 't';
-			   
-			   if (T[*n].xrN == a && T[*n].yrN == b) { T[*n].xrN = -1; T[*n].yrN = -1; }
-
-			   if ( conf.roqueB != 'e' && conf.roqueB != 'n' ) {
-			     if ( x == 0 && y == 0 && conf.roqueB != 'p')
-			   	T[*n].roqueB = 'g'; 
-			     else if ( x == 0 && y == 0 )
-			   	   T[*n].roqueB = 'n'; 
-			     if ( x == 0 && y == 7 && conf.roqueB != 'g' )
-			   	T[*n].roqueB = 'p'; 
-			     else if ( x == 0 && y == 7 )
-			   	   T[*n].roqueB = 'n'; 
-			   }
-
-			   (*n)++;
-		   	   a = a + D[i][0];
-		   	   b = b + D[i][1];
-			}
-		   } 
-		} 
-		break;
-
-	
-	case 'n' : 
-		for (i=0; i<8; i += 1) {
-		   
-		   stop = 0;
-		   a = x + D[i][0];
-		   b = y + D[i][1];	  	 
-		   while ( !stop && a >= 0 && a <= 7 && b >= 0 && b <= 7 ) {
-			if ( conf.mat[ a ] [ b ] > 0 )  stop = 1;
-			else {
-			   copier(&conf, &T[*n]);
-			   T[*n].mat[x][y] = 0;
-			   if ( T[*n].mat[a][b] < 0 ) stop = 1;
-			   T[*n].mat[a][b] = 'n';
-			   
-			   if (T[*n].xrN == a && T[*n].yrN == b) { T[*n].xrN = -1; T[*n].yrN = -1; }
+			   if (T[*n].xkingB == a && T[*n].ykingB == b) { T[*n].xkingB = -1; T[*n].ykingB = -1; }
 
 			   (*n)++;
 		   	   a = a + D[i][0];
@@ -434,30 +373,91 @@ static void deplacementsB(struct config conf, int x, int y, struct config T[], i
 
 	
 	case 'r' : 
+		for (i=0; i<8; i += 2) {
+		   
+		   stop = 0;
+		   a = x + D[i][0];
+		   b = y + D[i][1];	  	 
+		   while ( !stop && a >= 0 && a <= 7 && b >= 0 && b <= 7 ) {
+			if ( conf.mat[ a ] [ b ] > 0 )  stop = 1;
+			else {
+			   copier(&conf, &T[*n]);
+			   T[*n].mat[x][y] = 0;
+			   if ( T[*n].mat[a][b] < 0 ) stop = 1;
+			   T[*n].mat[a][b] = 'r';
+			   
+			   if (T[*n].xkingB == a && T[*n].ykingB == b) { T[*n].xkingB = -1; T[*n].ykingB = -1; }
+
+			   if ( conf.castlingW != 'e' && conf.castlingW != 'q' ) {
+			     if ( x == 0 && y == 0 && conf.castlingW != 'p')
+			   	T[*n].castlingW = 'g'; 
+			     else if ( x == 0 && y == 0 )
+			   	   T[*n].castlingW = 'q'; 
+			     if ( x == 0 && y == 7 && conf.castlingW != 'g' )
+			   	T[*n].castlingW = 'p'; 
+			     else if ( x == 0 && y == 7 )
+			   	   T[*n].castlingW = 'q'; 
+			   }
+
+			   (*n)++;
+		   	   a = a + D[i][0];
+		   	   b = b + D[i][1];
+			}
+		   } 
+		} 
+		break;
+
+	
+	case 'q' : 
+		for (i=0; i<8; i += 1) {
+		   
+		   stop = 0;
+		   a = x + D[i][0];
+		   b = y + D[i][1];	  	 
+		   while ( !stop && a >= 0 && a <= 7 && b >= 0 && b <= 7 ) {
+			if ( conf.mat[ a ] [ b ] > 0 )  stop = 1;
+			else {
+			   copier(&conf, &T[*n]);
+			   T[*n].mat[x][y] = 0;
+			   if ( T[*n].mat[a][b] < 0 ) stop = 1;
+			   T[*n].mat[a][b] = 'q';
+			   
+			   if (T[*n].xkingB == a && T[*n].ykingB == b) { T[*n].xkingB = -1; T[*n].ykingB = -1; }
+
+			   (*n)++;
+		   	   a = a + D[i][0];
+		   	   b = b + D[i][1];
+			}
+		   } 
+		} 
+		break;
+
+	
+	case 'e' : 
 		
-		if ( conf.roqueB != 'n' && conf.roqueB != 'e' ) {
-		   if ( conf.roqueB != 'g' && conf.mat[0][1] == 0 && conf.mat[0][2] == 0 && conf.mat[0][3] == 0 )
-		      if ( !caseMenaceePar( MIN, 0, 1, conf ) && !caseMenaceePar( MIN, 0, 2, conf ) && \
-			   !caseMenaceePar( MIN, 0, 3, conf ) && !caseMenaceePar( MIN, 0, 4, conf ) )  {
+		if ( conf.castlingW != 'q' && conf.castlingW != 'e' ) {
+		   if ( conf.castlingW != 'g' && conf.mat[0][1] == 0 && conf.mat[0][2] == 0 && conf.mat[0][3] == 0 )
+		      if ( !threatened_square( MIN, 0, 1, conf ) && !threatened_square( MIN, 0, 2, conf ) && \
+			   !threatened_square( MIN, 0, 3, conf ) && !threatened_square( MIN, 0, 4, conf ) )  {
 			
 			copier(&conf, &T[*n]);
 			T[*n].mat[0][4] = 0;
 			T[*n].mat[0][0] = 0;
-			T[*n].mat[0][2] = 'r'; T[*n].xrB = 0; T[*n].yrB = 2;
-			T[*n].mat[0][3] = 't';
-			T[*n].roqueB = 'e'; 
+			T[*n].mat[0][2] = 'e'; T[*n].xkingW = 0; T[*n].ykingW = 2;
+			T[*n].mat[0][3] = 'r';
+			T[*n].castlingW = 'e'; 
 			(*n)++;
 		      }
-		   if ( conf.roqueB != 'p' && conf.mat[0][5] == 0 && conf.mat[0][6] == 0 )
-		      if ( !caseMenaceePar( MIN, 0, 4, conf ) && !caseMenaceePar( MIN, 0, 5, conf ) && \
-			   !caseMenaceePar( MIN, 0, 6, conf ) )  {
+		   if ( conf.castlingW != 'p' && conf.mat[0][5] == 0 && conf.mat[0][6] == 0 )
+		      if ( !threatened_square( MIN, 0, 4, conf ) && !threatened_square( MIN, 0, 5, conf ) && \
+			   !threatened_square( MIN, 0, 6, conf ) )  {
 			
 			copier(&conf, &T[*n]);
 			T[*n].mat[0][4] = 0;
 			T[*n].mat[0][7] = 0;
-			T[*n].mat[0][6] = 'r'; T[*n].xrB = 0; T[*n].yrB = 6;
-			T[*n].mat[0][5] = 't';
-			T[*n].roqueB = 'e'; 
+			T[*n].mat[0][6] = 'e'; T[*n].xkingW = 0; T[*n].ykingW = 6;
+			T[*n].mat[0][5] = 'r';
+			T[*n].castlingW = 'e'; 
 			(*n)++;
 
 		      }
@@ -472,11 +472,11 @@ static void deplacementsB(struct config conf, int x, int y, struct config T[], i
 			if ( conf.mat[a][b] <= 0 ) {
 			   copier(&conf, &T[*n]);
 			   T[*n].mat[x][y] = 0;
-			   T[*n].mat[a][b] = 'r'; T[*n].xrB = a; T[*n].yrB = b;
+			   T[*n].mat[a][b] = 'e'; T[*n].xkingW = a; T[*n].ykingW = b;
 			   
-			   if (T[*n].xrN == a && T[*n].yrN == b) { T[*n].xrN = -1; T[*n].yrN = -1; }
+			   if (T[*n].xkingB == a && T[*n].ykingB == b) { T[*n].xkingB = -1; T[*n].ykingB = -1; }
 
-			   T[*n].roqueB = 'n'; 
+			   T[*n].castlingW = 'q'; 
 			   (*n)++;
 			}
 		} 

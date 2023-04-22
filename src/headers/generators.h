@@ -17,7 +17,7 @@ static void compute_best_score(Temple_return *t,int n,int* j,int r)
 	
 }
 
-static void generer_succ( struct config conf, int mode, struct config T[], int *n )
+static void generate_succ( struct config conf, int mode, struct config T[], int *n )
 {
 	int i, j, k, stop;
 
@@ -28,13 +28,13 @@ static void generer_succ( struct config conf, int mode, struct config T[], int *
 	   for (i=0; i<8; i++)
 	      for (j=0; j<8; j++)
 		 if ( conf.mat[i][j] > 0 )
-		    deplacementsB(conf, i, j, T, n );
+		    displacementsW(conf, i, j, T, n );
 
 	   
 	   for (k=0; k < *n; k++) {
-	      	i = T[k].xrB; j = T[k].yrB;  
+	      	i = T[k].xkingW; j = T[k].ykingW;  
 		
-		if ( caseMenaceePar( MIN, i, j, T[k] ) ) {
+		if ( threatened_square( MIN, i, j, T[k] ) ) {
 		    T[k] = T[(*n)-1];	
 		    (*n)--;
 		    k--;
@@ -47,14 +47,14 @@ static void generer_succ( struct config conf, int mode, struct config T[], int *
 	   for (i=0; i<8; i++)
 	      for (j=0; j<8; j++)
 		 if ( conf.mat[i][j] < 0 )
-		    deplacementsN(conf, i, j, T, n );
+		    displacementsBl(conf, i, j, T, n );
 
 	   
 	   for (k=0; k < *n; k++) 
 	   {
-		i = T[k].xrN; j = T[k].yrN;
+		i = T[k].xkingB; j = T[k].ykingB;
 		
-		if ( caseMenaceePar( MAX, i, j, T[k] ) ) {
+		if ( threatened_square( MAX, i, j, T[k] ) ) {
 		    T[k] = T[(*n)-1];	
 		    (*n)--;
 		    k--;
@@ -70,14 +70,14 @@ static void generer_succ( struct config conf, int mode, struct config T[], int *
 
 
 
-static int minmax_ab2( struct config conf, int mode, int niv, int alpha, int beta, long * nb_noeuds, long * nb_coupes)
+static int minmax_ab2( struct config conf, int mode, int niv, int alpha, int beta, long * nb_noeuds, long * skip_pruning)
 {
 	
  	int n, i, score, score2;
  	struct config T[100];
 	*nb_noeuds += 1;
 
-   	if ( feuille(conf, &score) ) 
+   	if ( leaf(conf, &score) ) 
 		return score;
 
    	if ( niv == 0 ) 
@@ -86,19 +86,19 @@ static int minmax_ab2( struct config conf, int mode, int niv, int alpha, int bet
    	if ( mode == MAX ) 
 	{
 
-	   generer_succ( conf, MAX, T, &n );
+	   generate_succ( conf, MAX, T, &n );
 	   trier_config_table(T, n);
 	  
 
 	   score = alpha;
 	   for ( i=0; i<n/2; i++ ) 
 	   {
-   	    	score2 = minmax_ab2( T[i], MIN, niv-1, score, beta, nb_noeuds, nb_coupes);
+   	    	score2 = minmax_ab2( T[i], MIN, niv-1, score, beta, nb_noeuds, skip_pruning);
 			if (score2 > score) score = score2;
 			if (score > beta) 
 			{
 				
-					*nb_coupes += 1;
+					*skip_pruning += 1;
 					
 					return beta;   
 			}
@@ -107,18 +107,18 @@ static int minmax_ab2( struct config conf, int mode, int niv, int alpha, int bet
 	else  
 	{ 
 
-	   generer_succ( conf, MIN, T, &n );
+	   generate_succ( conf, MIN, T, &n );
 	   trier_config_table(T, n);
 	  
 	   score = beta;
 	   for ( i=n-1; i >=n/2; i--) 
 	   {
-   	    	score2 = minmax_ab2( T[i], MAX, niv-1, alpha, score, nb_noeuds, nb_coupes);
+   	    	score2 = minmax_ab2( T[i], MAX, niv-1, alpha, score, nb_noeuds, skip_pruning);
 			if (score2 < score) score = score2;
 			if (score < alpha) 
 			{
 				
-					*nb_coupes += 1;
+					*skip_pruning += 1;
 					
 					return alpha;   
 	    	}
@@ -131,14 +131,14 @@ static int minmax_ab2( struct config conf, int mode, int niv, int alpha, int bet
 } 
 
 
-static int minmax_ab( struct config conf, int mode, int niv, int alpha, int beta, long * nb_noeuds, long * nb_coupes)
+static int minmax_ab( struct config conf, int mode, int niv, int alpha, int beta, long * nb_noeuds, long * skip_pruning)
 {
 	
  	int n, i, score, score2;
  	struct config T[100];
 	*nb_noeuds += 1;
 
-   	if ( feuille(conf, &score) ) 
+   	if ( leaf(conf, &score) ) 
 		return score;
 
    	if ( niv == 0 ) 
@@ -147,17 +147,17 @@ static int minmax_ab( struct config conf, int mode, int niv, int alpha, int beta
    	if ( mode == MAX ) 
 	{
 
-	   generer_succ( conf, MAX, T, &n );
+	   generate_succ( conf, MAX, T, &n );
 
 	   score = alpha;
 	   for ( i=0; i<n; i++ ) 
 	   {
-   	    	score2 = minmax_ab( T[i], MIN, niv-1, score, beta, nb_noeuds, nb_coupes);
+   	    	score2 = minmax_ab( T[i], MIN, niv-1, score, beta, nb_noeuds, skip_pruning);
 			if (score2 > score) score = score2;
 			if (score > beta) 
 			{
 				
-					*nb_coupes += 1;
+					*skip_pruning += 1;
 					
 					return beta;   
 			}
@@ -166,17 +166,17 @@ static int minmax_ab( struct config conf, int mode, int niv, int alpha, int beta
 	else  
 	{ 
 
-	   generer_succ( conf, MIN, T, &n );
+	   generate_succ( conf, MIN, T, &n );
 
 	   score = beta;
 	   for ( i=0; i<n; i++ ) 
 	   {
-   	    	score2 = minmax_ab( T[i], MAX, niv-1, alpha, score, nb_noeuds, nb_coupes);
+   	    	score2 = minmax_ab( T[i], MAX, niv-1, alpha, score, nb_noeuds, skip_pruning);
 			if (score2 < score) score = score2;
 			if (score < alpha) 
 			{
 				
-					*nb_coupes += 1;
+					*skip_pruning += 1;
 					
 					return alpha;   
 	    	}
@@ -194,7 +194,7 @@ static int minmax( struct config conf, int mode, int niv)
  	int n, i, score, score2;
  	struct config T[100];
 
-   	if ( feuille(conf, &score) ) 
+   	if ( leaf(conf, &score) ) 
 		return score;
 
    	if ( niv == 0 ) 
@@ -202,7 +202,7 @@ static int minmax( struct config conf, int mode, int niv)
 
    	if ( mode == MAX ) {
 
-	   generer_succ( conf, MAX, T, &n );
+	   generate_succ( conf, MAX, T, &n );
 
 	   score = -INFINI;
 	   for ( i=0; i<n; i++ ) 
@@ -214,7 +214,7 @@ static int minmax( struct config conf, int mode, int niv)
 	}
 	else  { 
 
-	   generer_succ( conf, MIN, T, &n );
+	   generate_succ( conf, MIN, T, &n );
 
 	   score = +INFINI;
 	   for ( i=0; i<n; i++ ) {
@@ -231,12 +231,12 @@ static int minmax( struct config conf, int mode, int niv)
 
 }
 
-static int iterative_deepening(struct config conf, int mode, int niv, int alpha, int beta, long * nb_noeuds, long * nb_coupes)
+static int iterative_deepening(struct config conf, int mode, int niv, int alpha, int beta, long * nb_noeuds, long * skip_pruning)
 {
 	int n,j, i, score, score2;
  	struct config T[100];
 
-	if ( feuille(conf, &score) ) 
+	if ( leaf(conf, &score) ) 
 		return score;
 
    	if ( niv == 0 ) 
@@ -245,13 +245,13 @@ static int iterative_deepening(struct config conf, int mode, int niv, int alpha,
 	if (mode == MAX)
 	{
 
-		generer_succ(conf, MAX, T, &n);
+		generate_succ(conf, MAX, T, &n);
 
 		for (i = 0; i < niv; i++)
 		{
 			for (j = 0; j < n; j++)
 			{
-				T[j].val =  minmax_ab(T[j], MIN, i, alpha, beta, nb_noeuds, nb_coupes);
+				T[j].val =  minmax_ab(T[j], MIN, i, alpha, beta, nb_noeuds, skip_pruning);
 			}
 
 			trier_config_table(T, n);
@@ -262,13 +262,13 @@ static int iterative_deepening(struct config conf, int mode, int niv, int alpha,
 	}
 	else 
 	{
-		generer_succ(conf, MIN, T, &n);
+		generate_succ(conf, MIN, T, &n);
 
 		for (i = 0; i < niv; i++)
 		{
 			for (j = n-1; j >= 0; j--)
 			{
-				T[j].val =  minmax_ab(T[j], MAX, i, alpha, beta, nb_noeuds, nb_coupes);
+				T[j].val =  minmax_ab(T[j], MAX, i, alpha, beta, nb_noeuds, skip_pruning);
 			}
 
 			trier_config_table(T, n);

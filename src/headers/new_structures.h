@@ -3,8 +3,8 @@
 struct config {
 	char mat[8][8];
 	int val;
-	char xrN, yrN, xrB, yrB;
-	char roqueN, roqueB;	
+	char xkingB, ykingB, xkingW, ykingW;
+	char castlingB, castlingW;	
 };
  
 struct Temple_return
@@ -76,7 +76,7 @@ static int RookTable[64] = {
 	0	    ,	0	    ,	25	    ,	50	    ,	50	    ,	25	    ,	0	    ,	0
 };
 
-static int KingE[64] = {
+static int KingMid[64] = {
 	-500    ,	-50	    ,	0   	,	0   	,	0   	,	0   	,	-50	    ,	-500	,
 	-50     ,	0	    ,	50 	    ,	50	    ,	50	    ,	50	    ,	0   	,	-50     ,
 	0	    ,	50	    ,	90	    ,	90	    ,	90	    ,	90	    ,	50	    ,	0	    ,
@@ -87,7 +87,7 @@ static int KingE[64] = {
 	-500 	,	-50	    ,	0	    ,	0	    ,	0	    ,	0	    ,	-50	    ,	-500
 };
 
-static int KingO[64] = {
+static int KingEnd[64] = {
 	0	    ,	25	    ,	25	    ,	-50     ,	-50 	,	0	    ,	50	    ,	25	    ,
 	-300	,	-300	,	-300	,	-300	,	-300	,	-300	,	-300	,	-300	,
 	-500	,	-500	,	-500	,	-500	,	-500	,	-500	,	-500	,	-500	,
@@ -113,8 +113,8 @@ static void init( struct config *conf )
 		for (j=0; j<8; j++)
 			conf->mat[i][j] = 0;	
 
-	conf->mat[0][0] =  't'; conf->mat[0][1] =  'c'; conf->mat[0][2] = 'f'; conf->mat[0][3] =  'n';
-	conf->mat[0][4] =  'r'; conf->mat[0][5] =  'f'; conf->mat[0][6] = 'c'; conf->mat[0][7] =  't';
+	conf->mat[0][0] =  'r'; conf->mat[0][1] =  'k'; conf->mat[0][2] = 'b'; conf->mat[0][3] =  'q';
+	conf->mat[0][4] =  'e'; conf->mat[0][5] =  'b'; conf->mat[0][6] = 'k'; conf->mat[0][7] =  'r';
 
 	for (j=0; j<8; j++) {
 		conf->mat[1][j] = 'p';
@@ -122,11 +122,11 @@ static void init( struct config *conf )
 		conf->mat[7][j] = -conf->mat[0][j];
 	}
 
-	conf->xrB = 0; conf->yrB = 4;
-	conf->xrN = 7; conf->yrN = 4;
+	conf->xkingW = 0; conf->ykingW = 4;
+	conf->xkingB = 7; conf->ykingB = 4;
 
-	conf->roqueB = 'r';
-	conf->roqueN = 'r';
+	conf->castlingW = 'e';
+	conf->castlingB = 'e';
 
 	conf->val = 0;
 
@@ -190,14 +190,14 @@ static void rand_init(struct config *conf) {
     }
 
     // Set the pieces to the standard starting position
-    conf->mat[0][0] = 't';
-    conf->mat[0][1] = 'c';
-    conf->mat[0][2] = 'f';
-    conf->mat[0][3] = 'n';
-    conf->mat[0][4] = 'r';
-    conf->mat[0][5] = 'f';
-    conf->mat[0][6] = 'c';
-    conf->mat[0][7] = 't';
+    conf->mat[0][0] = 'r';
+    conf->mat[0][1] = 'k';
+    conf->mat[0][2] = 'b';
+    conf->mat[0][3] = 'q';
+    conf->mat[0][4] = 'e';
+    conf->mat[0][5] = 'b';
+    conf->mat[0][6] = 'k';
+    conf->mat[0][7] = 'r';
     conf->mat[1][0] = 'p';
     conf->mat[1][1] = 'p';
     conf->mat[1][2] = 'p';
@@ -206,14 +206,14 @@ static void rand_init(struct config *conf) {
     conf->mat[5][5] = 'p';
     conf->mat[1][6] = 'p';
     conf->mat[1][7] = 'p';
-    conf->mat[7][0] = -'t';
-    conf->mat[7][1] = -'c';
-    conf->mat[7][2] = -'f';
-    conf->mat[7][3] = -'r';
-    conf->mat[7][4] = -'n';
-    conf->mat[7][5] = -'f';
-    conf->mat[7][6] = -'c';
-    conf->mat[7][7] = -'t';
+    conf->mat[7][0] = -'r';
+    conf->mat[7][1] = -'k';
+    conf->mat[7][2] = -'b';
+    conf->mat[7][3] = -'e';
+    conf->mat[7][4] = -'q';
+    conf->mat[7][5] = -'b';
+    conf->mat[7][6] = -'k';
+    conf->mat[7][7] = -'r';
     conf->mat[6][0] = -'p';
     conf->mat[6][1] = -'p';
     conf->mat[6][2] = -'p';
@@ -230,18 +230,18 @@ static void rand_init(struct config *conf) {
     int xN = rand() % 8;
     int yN = rand() % 8;
     conf->mat[xB][yB] = 'k';
-    conf->xrB = xB;
-    conf->yrB = yB;
+    conf->xkingW = xB;
+    conf->ykingW = yB;
     conf->mat[xN][yN] = -'k';
-    conf->xrN = xN;
-    conf->yrN = yN;
+    conf->xkingB = xN;
+    conf->ykingB = yN;
 
     // Set the other variables
-   conf->xrB = 0; conf->yrB = 4;
-	conf->xrN = 7; conf->yrN = 4;
+   conf->xkingW = 0; conf->ykingW = 4;
+	conf->xkingB = 7; conf->ykingB = 4;
 
-	conf->roqueB = 'r';
-	conf->roqueN = 'r';
+	conf->castlingW = 'e';
+	conf->castlingB = 'e';
 
 	conf->val = 0;
 }

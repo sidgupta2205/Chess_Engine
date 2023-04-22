@@ -2,7 +2,7 @@
 #include "new_structures.h"
 #include "definations.h"
 
-static int minmax_ab( struct config conf, int mode, int niv, int min, int max, long * nb_noeuds, long * nb_coupes);
+static int minmax_ab( struct config conf, int mode, int niv, int min, int max, long * nb_noeuds, long * skip_pruning);
 
 
 static int AucunCoupPossible( struct config conf )
@@ -12,26 +12,26 @@ static int AucunCoupPossible( struct config conf )
 
 } 
 
-static int feuille( struct config conf, int *cout )
+static int leaf( struct config conf, int *cout )
 {
 	
 	
 	*cout = 0;
 
 	
-	if ( conf.xrB == -1 ) { 
+	if ( conf.xkingW == -1 ) { 
 	   *cout = -100;
 	   return 1; 
 	}
 
 	
-	if ( conf.xrN == -1 ) {
+	if ( conf.xkingB == -1 ) {
 	   *cout = +100;
 	   return 1;
 	}
 
 	
-	if (  conf.xrB != -1 &&  conf.xrN != -1 && AucunCoupPossible( conf ) )
+	if (  conf.xkingW != -1 &&  conf.xkingB != -1 && AucunCoupPossible( conf ) )
 	   return 1;
 
 	
@@ -48,13 +48,13 @@ static void copier( struct config *c1, struct config *c2 )
 			c2->mat[i][j] = c1->mat[i][j];
 
 	c2->val = c1->val;
-	c2->xrB = c1->xrB;
-	c2->yrB = c1->yrB;
-	c2->xrN = c1->xrN;
-	c2->yrN = c1->yrN;
+	c2->xkingW = c1->xkingW;
+	c2->ykingW = c1->ykingW;
+	c2->xkingB = c1->xkingB;
+	c2->ykingB = c1->ykingB;
 
-	c2->roqueB = c1->roqueB;
-	c2->roqueN = c1->roqueN;
+	c2->castlingW = c1->castlingW;
+	c2->castlingB = c1->castlingB;
 } 
 
 
@@ -164,31 +164,31 @@ static int estim(struct config board)
                         }
                     }
                 break;
-                case 'C':
+                case 'k':
                     materiel += 300;
 
                     matrice += KnightTable[j + i * 8];
                 break;
-                case -'C':
+                case -'k':
                     materiel -= 300;
 
                     matrice -= KnightTable[j + (7 - i) * 8];
                 break;
-                case 'f':
+                case 'b':
                     materiel += 325;
 
                     matrice += BishopTable[j + i * 8];
 
                     nbrBishopB ++;
                 break;
-                case -'f':
+                case -'b':
                     materiel -= 325;
 
                     matrice -= BishopTable[j + (7 - i) * 8];
 
                     nbrBishopN ++;
                 break;
-                case 't':
+                case 'r':
                     materiel += 500;
 
                     matrice += RookTable[j + i * 8];
@@ -196,14 +196,14 @@ static int estim(struct config board)
                     k = 0;
                     while((k <= 7) && (board.mat[k][j] != 'p'))
                     {
-                        if(((board.mat[k][j] == 0) || (board.mat[k][j] == 't')) || (board.mat[k][j] < 0))
+                        if(((board.mat[k][j] == 0) || (board.mat[k][j] == 'r')) || (board.mat[k][j] < 0))
                         {
                             rockB_nbrOpen ++;
                         }
                         k++;
                     }
                 break;
-                case -'t':
+                case -'r':
                     materiel -= 500;
 
                     matrice -= RookTable[j + (7 - i) * 8];
@@ -211,55 +211,55 @@ static int estim(struct config board)
                     k = 7;
                     while((k >= 0) && (board.mat[k][j] != -'p'))
                     {
-                        if(((board.mat[k][j] == 0) || (board.mat[k][j] == -'t')) || (board.mat[k][j] < 0))
+                        if(((board.mat[k][j] == 0) || (board.mat[k][j] == -'r')) || (board.mat[k][j] < 0))
                         {
                             rockN_nbrOpen ++;
                         }
                         k --;
                     }
                 break;
-                case 'n':
+                case 'q':
                     materiel += 1000;
                     k = 0;
                     while((k <= 7) && (board.mat[k][j] != 'p'))
                     {
-                        if(((board.mat[k][j] == 0) || (board.mat[k][j] == 'n')) || (board.mat[k][j] < 0))
+                        if(((board.mat[k][j] == 0) || (board.mat[k][j] == 'q')) || (board.mat[k][j] < 0))
                         {
                             queenB_nbrOpen ++;
                         }
                         k++;
                     }
                 break;
-                case -'n':
+                case -'q':
                     materiel -= 1000;
                     k = 7;
                     while((k >= 0) && (board.mat[k][j] != -'p'))
                     {
-                        if(((board.mat[k][j] == 0) || (board.mat[k][j] == -'n')) || (board.mat[k][j] < 0))
+                        if(((board.mat[k][j] == 0) || (board.mat[k][j] == -'q')) || (board.mat[k][j] < 0))
                         {
                             queenN_nbrOpen ++;
                         }
                         k --;
                     }
                 break;
-                case 'r':
+                case 'e':
                     if(nbrPieces(board, true) > 8)
                     {
-                        matrice += KingO[j + i * 8];
+                        matrice += KingEnd[j + i * 8];
                     }
                     if(nbrPieces(board, true) < 7)
                     {
-                        matrice += KingE[j + i * 8];
+                        matrice += KingMid[j + i * 8];
                     }
                 break;
-                case -'r':
+                case -'e':
                     if(nbrPieces(board, true) > 8)
                     {
-                        matrice -= KingO[j + (7 - i) * 8];
+                        matrice -= KingEnd[j + (7 - i) * 8];
                     }
                     if(nbrPieces(board, true) < 7)
                     {
-                        matrice -= KingE[j + (7 - i) * 8];
+                        matrice -= KingMid[j + (7 - i) * 8];
                     }
                 break;
             }

@@ -1,7 +1,5 @@
 // need minmax_ab func, alpha, beta, score, 
-
-#define MPI_COMM_WORLD 0
-#define datatype 0
+#include "definations.h"
 struct params
 {
     int id;
@@ -12,10 +10,10 @@ struct params
     int beta;
     int score;
     int j;
-    long nb_node1;
-    long nb_sec1;
-    long nb_node2;
-    long nb_sec2;
+    long num_node1;
+    long time_sec1;
+    long num_node2;
+    long time_sec2;
     struct config T[100];
 };
 

@@ -23,7 +23,7 @@ void randomize_board(struct config *conf) {
                 if (piece == 0) { // Pawn
                     conf->mat[row][col] = rand() % 2 == 0 ? 'p' : -'p'; // Randomly assign black or white pawn
                 } else if (piece == 1) { // Rook
-                    conf->mat[row][col] = rand() % 2 == 0 ? 'r' : -'r'; // Randomly assign black or white rook
+                    conf->mat[row][col] = rand() % 2 == 0 ? 'e' : -'e'; // Randomly assign black or white rook
                 } else if (piece == 2) { // Knight
                     conf->mat[row][col] = rand() % 2 == 0 ? 'q' : -'q'; // Randomly assign black or white knight
                 } else if (piece == 3) { // Bishop
@@ -39,11 +39,11 @@ void randomize_board(struct config *conf) {
     }
 
     
-    conf->xrB = 0; conf->yrB = 4;
-	conf->xrN = 7; conf->yrN = 4;
+    conf->xkingW = 0; conf->ykingW = 4;
+	conf->xkingB = 7; conf->ykingB = 4;
 
-	conf->roqueB = 'r';
-	conf->roqueN = 'r';
+	conf->castlingW = 'e';
+	conf->castlingB = 'e';
 
 	conf->val = 0;
 }

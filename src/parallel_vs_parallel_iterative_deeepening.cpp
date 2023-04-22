@@ -1,20 +1,20 @@
 #include "headers/compulsory_headers.h"
 #include "headers/generators.h"
-#include "headers/wrapper.h"
+#include "headers/utils.h"
 
 int main( int argc, char *argv[] )
 {
 	params p;
 	p.id = 5;
 	char sy, dy, ch[10];
-	int sx, dx, i, score, stop, cout, cout2, legal, sauter;
+	int sx, dx, i, score, stop, cout, cout2, legal, skip;
 	int cmin, cmax, cpt;
    	double stats1[100];
 	double stats2[100];
-	p.nb_node1=0;
-	p.nb_node2=0;
-	p.nb_sec1 = 0;
-	p.nb_sec2 = 0;
+	p.num_node1=0;
+	p.num_node2=0;
+	p.time_sec1 = 0;
+	p.time_sec2 = 0;
    struct config conf, conf1;
    
    	int size, rank;
@@ -40,8 +40,8 @@ int main( int argc, char *argv[] )
    struct timeval begin, end;
    double result;
    cpt = 0;
-   p.nb_node1=0;
-   p.nb_node2=0;
+   p.num_node1=0;
+   p.num_node2=0;
 	
 	int remaining = 10%size;
 
@@ -57,7 +57,7 @@ int main( int argc, char *argv[] )
 
 			printf("%d\n", cpt);
 			
-			generer_succ(conf, p.mode, p.T, &p.n);
+			generate_succ(conf, p.mode, p.T, &p.n);
 			
 			p.score = -INFINI*p.mode;
 			p.j = -1;
@@ -70,7 +70,7 @@ int main( int argc, char *argv[] )
 
 		//dummy code
 
-		long local_nb_node1 = 0, local_nb_sec1= 0, local_nb_sec2 = 0, local_nb_node2 = 0;
+		long local_num_node1 = 0, local_time_sec1= 0, local_time_sec2 = 0, local_num_node2 = 0;
 
 		struct Temple_return temp;
 		struct Temple_return* tempResultroot  = new Temple_return[10];
@@ -88,10 +88,10 @@ int main( int argc, char *argv[] )
 				if (p.mode == MAX)
 				{
 
-					local_nb_sec1 = 0;
-					local_nb_node1 = 0;
+					local_time_sec1 = 0;
+					local_num_node1 = 0;
 					
-					cout = iterative_deepening(p.T[i], MIN, p.depth-1, p.alpha, p.beta, &local_nb_node1, &local_nb_sec1);
+					cout = iterative_deepening(p.T[i], MIN, p.depth-1, p.alpha, p.beta, &local_num_node1, &local_time_sec1);
 
 					// modify the shared variable
 					if (cout > temp.val) 
@@ -102,17 +102,17 @@ int main( int argc, char *argv[] )
 							temp.val = cout;
 							temp.T = p.T[i];
 						}
-						p.nb_node1 += local_nb_node1;
-						p.nb_sec1 += local_nb_sec1;
+						p.num_node1 += local_num_node1;
+						p.time_sec1 += local_time_sec1;
 					// exit the critical section
 
 				}
 				else
 				{
-					local_nb_sec1 = 0;
-					local_nb_node1 = 0;
+					local_time_sec1 = 0;
+					local_num_node1 = 0;
 					
-					cout = minmax_ab(p.T[i], MIN, p.depth-1, p.alpha, p.beta, &local_nb_node1, &local_nb_sec1);
+					cout = minmax_ab(p.T[i], MIN, p.depth-1, p.alpha, p.beta, &local_num_node1, &local_time_sec1);
 
 					// modify the shared variable
 					if (cout < score) 
@@ -122,8 +122,8 @@ int main( int argc, char *argv[] )
 							temp.val = cout;
 							temp.T = p.T[i];
 						}
-						p.nb_node1 += local_nb_node1;
-						p.nb_sec1 += local_nb_sec1;
+						p.num_node1 += local_num_node1;
+						p.time_sec1 += local_time_sec1;
 					
 				}
 				
@@ -154,7 +154,7 @@ int main( int argc, char *argv[] )
 			}
 			else 
 			{ 
-				printf(" *** J'ai perdu ***\n");
+				printf(" *** Stopping ***\n");
 				stop = 1;
 			}
 		}
@@ -170,11 +170,11 @@ int main( int argc, char *argv[] )
 		char res[30];
 		FILE * f = fopen("results.txt", "w");
 
-		snprintf(res, 30, "%ld", p.nb_node1);
+		snprintf(res, 30, "%ld", p.num_node1);
 		fputs(res, f);
 		fputs("\n", f);
 
-		snprintf(res, 30, "%ld", p.nb_node2);
+		snprintf(res, 30, "%ld", p.num_node2);
 		fputs(res, f);
 		fputs("\n", f);
 
