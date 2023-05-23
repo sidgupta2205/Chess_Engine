@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Ignore the -n argument
+shift
+
+# Check if four arguments are passed
+if [ "$#" -ne 3 ]; then
+  echo "Error: Expected three arguments, found $# arguments."
+  exit 1
+fi
+
+# Extract the arguments
+a="$1"
+file="$2"
+b="$3"
+
+# Check if the file exists
+if [ ! -f "$file" ]; then
+  echo "Error: File $file not found."
+  exit 1
+fi
+
+# Compile and run the file with the given arguments
+./"${file%.*}" "$a" "$b"

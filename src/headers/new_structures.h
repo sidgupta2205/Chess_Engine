@@ -113,17 +113,25 @@ static void init( struct config *conf )
 		for (j=0; j<8; j++)
 			conf->mat[i][j] = 0;	
 
-	conf->mat[0][0] =  'r'; conf->mat[0][1] =  'k'; conf->mat[0][2] = 'b'; conf->mat[0][3] =  'q';
-	conf->mat[0][4] =  'e'; conf->mat[0][5] =  'b'; conf->mat[0][6] = 'k'; conf->mat[0][7] =  'r';
+	// conf->mat[0][0] =  'r'; conf->mat[0][1] =  'k'; conf->mat[0][2] = 'b'; conf->mat[0][3] =  'q';
+	// conf->mat[0][4] =  'e'; conf->mat[0][5] =  'b'; conf->mat[0][6] = 'k'; conf->mat[0][7] =  'r';
 
-	for (j=0; j<8; j++) {
-		conf->mat[1][j] = 'p';
- 		conf->mat[6][j] = -'p'; 
-		conf->mat[7][j] = -conf->mat[0][j];
-	}
+	// for (j=0; j<8; j++) {
+	// 	conf->mat[1][j] = 'p';
+ 	// 	conf->mat[6][j] = -'p'; 
+	// 	conf->mat[7][j] = -conf->mat[0][j];
+	// }
 
-	conf->xkingW = 0; conf->ykingW = 4;
-	conf->xkingB = 7; conf->ykingB = 4;
+	conf->mat[0][5] =  'r';
+	conf->mat[4][5] =  'r';
+	conf->mat[2][5] =  'b';
+	conf->mat[2][2] =  'e';
+	conf->mat[2][3] =  'p';
+	conf->mat[2][4] =  -'e';
+	conf->mat[2][7] =  -'b';
+
+	conf->xkingW = 2; conf->ykingW = 2;
+	conf->xkingB = 2; conf->ykingB = 4;
 
 	conf->castlingW = 'e';
 	conf->castlingB = 'e';

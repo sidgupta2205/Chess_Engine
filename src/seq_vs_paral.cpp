@@ -33,7 +33,7 @@ int main( int argc, char *argv[] )
    else
 	p.depth = atoi( argv[1] ); 
    
-   printf("\n \nDepthOfExploration = %d\n\n", p.depth);
+//    printf("\n \nDepthOfExploration = %d\n\n", p.depth);
    
    init( &conf );
    stop = 0;
@@ -56,8 +56,8 @@ int main( int argc, char *argv[] )
 			p.beta= +INFINI;
 
 
-
-			// printf("%d\n", cpt);
+			affich(conf);
+			printf("%d\n", cpt);
 			
 			generate_succ(conf, p.mode, p.T, &p.n);
 			
